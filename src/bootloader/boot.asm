@@ -4,7 +4,7 @@ bits 16
 %define ENDL 0x0D, 0x0A
 
 ;FAT12 header
-jmp short main_start
+jmp short start
 nop
 
 bdb_oem:                    db 'MSWIN4.1'
@@ -29,7 +29,7 @@ ebr_volume_id:      dw 0
 ebr_volume_label:   db 'Adrian L OS'
 ebr_system_id:      db 'FAT12   '
 
-main_start:
+start:
     
     ;sets up data segment
     mov ax, 0
@@ -269,7 +269,7 @@ disk_read:
     call lba_to_chs
     pop ax
 
-    mov ax, 0x02
+    mov ah, 0x02
     mov di, 3       ;retry counter
 
 .retry:
@@ -288,7 +288,6 @@ disk_read:
 
 .fail:
     jmp floppy_error
-    
 
 .done:
     popa
