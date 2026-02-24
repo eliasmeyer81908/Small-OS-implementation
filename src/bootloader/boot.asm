@@ -14,7 +14,7 @@ bdb_reserved_sectors:       dw 1
 bdb_fat_count:              db 2
 bdb_dir_entries_count:      dw 0x0E0
 bdb_total_sectors:          dw 2880
-bdb_media_descriptor_type:  db 0x0F0
+bdb_media_descriptor_type:  db 0xF0
 bdb_sectors_per_fat:        dw 9
 bdb_sectors_per_track:      dw 18
 bdb_heads:                  dw 2
@@ -25,14 +25,14 @@ bdb_large_sector_count:     dd 0
 ebr_drive_number:   db 0
                     db 0
 ebr_signature:      db 0x29
-ebr_volume_id:      db 0x12, 0x34, 0x56, 0x78
+ebr_volume_id:      dw 0
 ebr_volume_label:   db 'Adrian L OS'
 ebr_system_id:      db 'FAT12   '
 
 main_start:
     
     ;sets up data segment
-    xor ax, ax
+    mov ax, 0
     mov ds, ax
     mov es, ax
     
@@ -143,7 +143,7 @@ main_start:
 
     ;not nice since hardcoded value
     add ax, 31                      ;first cluster is (kernel_cluster-2)*sectors_per_cluster + start_sector
-                                    ; start sector = reserved + fat * root dir size = 1 + 18 + 134 (+=) 33
+                                    ; start sector = reserved + fat * root dir size = 1 + 18 + 134 = 33
     mov cl, 1
     mov dl, [ebr_drive_number]
     call disk_read
@@ -269,7 +269,7 @@ disk_read:
     call lba_to_chs
     pop ax
 
-    mov ax, 02h
+    mov ax, 0x02
     mov di, 3       ;retry counter
 
 .retry:
@@ -328,6 +328,7 @@ print_str:
     jz .done
 
     mov ah, 0x0E    ;calls bios interrupt
+    mov bh, 0
     int 0x10
     jmp .loop
 
@@ -340,9 +341,9 @@ print_str:
 
 
 msg_loading:             db 'Loading...', ENDL, 0
-msg_read_failed:         db 'Failed to read from disk', ENDL, 0
-msg_kernel_not_found:    db 'KERNEL.BIN not found!', ENDL, 0
-file_kernel_bin:         db 'KERNEL BIN'
+msg_read_failed:         db 'Read from disk failed!', ENDL, 0
+msg_kernel_not_found:    db 'KERNEL.BIN file not found!', ENDL, 0
+file_kernel_bin:         db 'KERNEL  BIN'
 kernel_cluster:          dw 0
 
 

@@ -33,6 +33,3 @@ print_str:
 
 
 msg_from_kernel: db 'Booted into the kernel', ENDL, 0
-
-times 510-($-$$) db 0
-dw 0AA55h
