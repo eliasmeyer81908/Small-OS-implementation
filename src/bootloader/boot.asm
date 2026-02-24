@@ -300,8 +300,9 @@ disk_read:
     pop bx
     pop ax
     ret
+;-------------------------------------------------------
 
-;resets disk controller
+;resets disk controller ---------------------------------
 ; params:
 ;   dl: drive number
 disk_reset:
@@ -312,6 +313,7 @@ disk_reset:
     jc floppy_error
     popa
     ret
+;--------------------------------------------------------
 
 
 ;prints string-------------------------------------------
