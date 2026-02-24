@@ -78,7 +78,7 @@ main_start:
     push ax
 
     ;compute the size of the root dir = 32 * number_of_entries / bytes_per_sector
-    mov ax, [bdb_sectors_per_fat]
+    mov ax, [bdb_dir_entries_count]
     shl ax, 5                       ; ax *= 32
     xor dx, dx                      ; dx = 0
     div word [bdb_bytes_per_sector] ; ax /= bytes per sector
@@ -101,7 +101,7 @@ main_start:
 
 .search_kernel:
     mov si, file_kernel_bin
-    mov cl, 11
+    mov cx, 11
     push di
     
     ;repe repeats a string instruction while the operands are equal(zf == 1) or until the cs register reaches 0
@@ -211,7 +211,7 @@ wait_key_and_reboot:
 
 .halt:
     cli         ;disable interrupts so CPU can't get out of halt state
-    jmp .halt
+    hlt
 
 ;converts lba to chs
 ;takes lba in ax
@@ -265,7 +265,7 @@ disk_read:
     push dx
     push di
 
-    push cs
+    push cx
     call lba_to_chs
     pop ax
 
@@ -320,17 +320,19 @@ disk_reset:
 print_str:
     push si
     push ax
+    push bx
 
 .loop:
     lodsb           ;loads next char into al
     or al, al       ;verifies if next character is null
     jz .done
 
-    mov ah, 0x0e    ;calls bios interrupt
+    mov ah, 0x0E    ;calls bios interrupt
     int 0x10
     jmp .loop
 
 .done:
+    pop bx
     pop ax
     pop si
     ret
