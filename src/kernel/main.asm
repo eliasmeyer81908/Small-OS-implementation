@@ -3,7 +3,7 @@ bits 16
 
 %define ENDL 0x0D, 0x0A
 
-gdt_begin:                  DQ 0, 0         ;null descriptor (8 bytes long)
+gdt_begin:                  DQ 0            ;null descriptor (8 bytes long)
 gdt_kernel_code_segment:    DW 0x0FFFFF, 0  ;kernel code segment (4GB)
                             DB 0            ;segment descriptor
 
@@ -28,15 +28,62 @@ gdt_kernel_code_segment:    DW 0x0FFFFF, 0  ;kernel code segment (4GB)
                             ;so: 11001111
                             DB 11001111b
                             DB 0            ;base address which is 0
-                            
+
+; keep the segments with defaulted values as the first segment to mimic flat data
+; each segment is 4Mb
+
+                            DB 0, 0         ;two bytes since going frmo x0008 to x0010
+
+gdt_kernel_data_segment:    DW 0x0FFFFF, 0
+                            DB 0
+                            DB 10011010b
+                            DB 11001111b
+                            DB 0
+
+user_mode_code_segment:     DW 0x0FFFFF, 0
+                            DB 0
+                            DB 10011010b
+                            DB 11001111b
+                            DB 0
+
+user_mode_data_segment:     DW 0x0FFFF, 0
+                            DB 0
+                            DB 10011010b
+                            DB 11001111b
+                            DB 0
+
+;TSS - set up later
+
+
+gdt_end:
+    db gdt_end - gdt_begin
+    dw gdt_begin
+
 
 main_start:
     
     mov si, msg_from_kernel
     call print_str
 
+    mov si, msg_setting_up_gdt
+    call print_str
+    
+    ;reset data segment and load gdt
+    cli
+    xor ax, ax
+    mov dx, ax
+    lgdt [gdt_end]
+    sti
+
+    ;switch to protected mode
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
 
 
+cleared_pipe:
+    mov si, msg_done_with_gdt
+    call print_str
 
     cli
     hlt
@@ -63,4 +110,5 @@ print_str:
 
 
 msg_from_kernel:        db 'Booted into the kernel', ENDL, 0
-msg_setting_up_gdt:     db 'Setting up the GDT', ENDL, 0
+msg_setting_up_gdt:     db 'Setting up the glob desc table', ENDL, 0
+msg_done_with_gdt:      db 'Done setting up the glob desc table', ENDL, 0
