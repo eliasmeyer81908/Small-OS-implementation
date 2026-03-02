@@ -46,14 +46,17 @@ user_mode_code_segment:     DW 0x0FFFFF, 0
                             DB 11001111b
                             DB 0
 
-user_mode_data_segment:     DW 0x0FFFF, 0
+user_mode_data_segment:     DW 0x0FFFFF, 0
                             DB 0
                             DB 10011010b
                             DB 11001111b
                             DB 0
 
-;TSS - set up later
-
+tss_segment:                DW 0x0FFFFF, 0
+                            DB 0
+                            DB 10011010b
+                            DB 11001111b
+                            DB 0
 
 gdt_end:
     db gdt_end - gdt_begin
@@ -71,7 +74,7 @@ main_start:
     ;reset data segment and load gdt
     cli
     xor ax, ax
-    mov dx, ax
+    mov ds, ax
     lgdt [gdt_end]
     sti
 
