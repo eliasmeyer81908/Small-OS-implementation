@@ -80,6 +80,8 @@ main_start:
     or eax, 1
     mov cr0, eax
 
+    jmp 0x08:cleared_pipe
+
 
 cleared_pipe:
     mov si, msg_done_with_gdt
