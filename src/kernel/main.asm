@@ -34,25 +34,25 @@ gdt_kernel_code_segment:    DW 0xFFFF, 0    ;kernel code segment (4GB)
 
                             DB 0, 0         ;two bytes since going frmo x0008 to x0010
 
-gdt_kernel_data_segment:    DW 0x0FFFFF, 0
+gdt_kernel_data_segment:    DW 0xFFFF, 0
                             DB 0
                             DB 10010010b
                             DB 11001111b
                             DB 0
 
-user_mode_code_segment:     DW 0x0FFFFF, 0
+user_mode_code_segment:     DW 0xFFFF, 0
                             DB 0
                             DB 10011010b
                             DB 11001111b
                             DB 0
 
-user_mode_data_segment:     DW 0x0FFFFF, 0
+user_mode_data_segment:     DW 0xFFFF, 0
                             DB 0
                             DB 10010010b
                             DB 11001111b
                             DB 0
 
-tss_segment:                DW 0x0FFFFF, 0
+tss_segment:                DW 0xFFFF, 0
                             DB 0
                             DB 10011010b
                             DB 11001111b
